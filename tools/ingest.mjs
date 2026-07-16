@@ -24,6 +24,18 @@ import { contextFromManifest } from '../lib/canon.mjs';
 const repoRoot = path.resolve(path.dirname(new URL(import.meta.url).pathname), '..');
 const expand = (p) => p.replace(/^~(?=$|\/)/, os.homedir());
 
+// Auto mode (watcher/launchd): no terminal attached, so never prompt —
+// auto-accept suggested initials for new participants and log the decision.
+const AUTO = process.argv.includes('--auto') || !process.stdin.isTTY;
+
+// Load .env (gitignored) so the watcher gets ANTHROPIC_API_KEY without a shell profile.
+try {
+  for (const line of fs.readFileSync(path.join(repoRoot, '.env'), 'utf8').split('\n')) {
+    const m = line.match(/^\s*([\w.]+)\s*=\s*(.*)\s*$/);
+    if (m && !(m[1] in process.env)) process.env[m[1]] = m[2].replace(/^["']|["']$/g, '');
+  }
+} catch { /* no .env — rely on the environment */ }
+
 function loadConfig() {
   return yaml.load(fs.readFileSync(path.join(repoRoot, 'config.yaml'), 'utf8'));
 }
@@ -78,6 +90,12 @@ async function resolveRoster(participants, roster, rl) {
   for (const name of participants) {
     if (roster[name]) continue;
     const suggestion = suggestInitials(name, taken);
+    if (AUTO) {
+      console.log(`  auto-assigned initials for new participant: ${suggestion}`);
+      roster[name] = suggestion;
+      taken.add(suggestion);
+      continue;
+    }
     const answer = (
       await rl.question(`New participant "${name}" — initials [${suggestion}]: `)
     ).trim().toUpperCase();

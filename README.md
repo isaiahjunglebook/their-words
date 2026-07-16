@@ -36,11 +36,26 @@ echo 'ANTHROPIC_API_KEY=sk-ant-…' > .env   # gitignored
 ```
 
 `roster.yaml` (full name → initials) is created interactively on first ingest
-and stays local forever. Run the pipeline with:
+and stays local forever. Run the pipeline manually with:
 
 ```sh
 npm run ingest
 ```
+
+**Fully automatic mode (recommended):** install the watcher once —
+
+```sh
+bash tools/install-watcher.sh
+```
+
+This registers a macOS LaunchAgent that runs ingest automatically whenever
+the audio processor writes new output (plus a 10-minute timer fallback).
+End-to-end that means: finish a Zoom call → upstream transcribes it → ingest
+extracts, anonymizes, commits, and pushes → candidates are waiting in the
+dashboard Review queue. In auto mode, new participants get auto-suggested
+initials — glance at `roster.yaml` before approving a new man's first quote.
+Requirements: `ANTHROPIC_API_KEY` in `.env`, and `git push` working without a
+prompt (keychain or SSH key). Logs: `~/Library/Logs/their-words-ingest.log`.
 
 ### 2. Vercel (dashboard)
 
