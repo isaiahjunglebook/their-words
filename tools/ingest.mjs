@@ -215,11 +215,14 @@ async function main() {
       continue;
     }
 
+    // A call is ingested when EITHER the upstream's call-level tags match the
+    // ingest set OR an ingest keyword appears in the meeting name / Zoom
+    // topic — so titling a meeting "… — Expedition" is always sufficient.
     const callTags = manifest.tags || [];
+    const nameText = `${manifest.call_name || ''} ${manifest.zoom_topic || ''}`.toLowerCase();
     const matches =
       callTags.some((t) => ingestTags.has(t)) ||
-      (!manifest.classification &&
-        [...ingestTags].some((t) => (manifest.call_name || '').toLowerCase().includes(t)));
+      [...ingestTags].some((t) => nameText.includes(t));
     if (!matches) {
       console.log(`- ${slug}: tags [${callTags.join(', ')}] don't match ingest set, skipping`);
       state.slugs.push(slug); // decided: not ours; don't re-evaluate every run
