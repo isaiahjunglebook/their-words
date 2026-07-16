@@ -15,7 +15,7 @@ export default async function handler(req, res) {
     const entry = {
       id: nextId(entries),
       date,
-      man: (man || '').toUpperCase().trim(),
+      man: (man || '').trim(),
       context: 'Text',
       quote: (quote || '').trim(),
       tags: Array.isArray(tags) ? tags.filter(Boolean) : [],
