@@ -151,3 +151,8 @@ label input, label textarea { margin-top: 0.25rem; }
 .gate-box form { justify-content: center; margin-top: 1rem; }
 .gate-box input { max-width: 200px; }
 .gate-box .error { margin-top: 0.6rem; }
+
+/* The hidden attribute must always win, even over display:flex rules
+   (without this, the unlocked gate stays visible — the display:flex on
+   .gate outranks the browser's built-in [hidden] rule). */
+[hidden] { display: none !important; }
