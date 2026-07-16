@@ -52,10 +52,26 @@ In addition to the spec's six fields, each entry stores
 timestamp + slug inside the quote block; structured is equivalent and easier
 to render). `context: Text` entries have `source: null`.
 
-## A5 — Password gate is app-level, layered under platform protection
+## A5 — Password gate is app-level and covers the whole site (amended 2026-07-16)
 
 The owner asked for a simple password. `ADMIN_PASSWORD` (Vercel env var,
-compared with `crypto.timingSafeEqual`) gates every write/read of candidate
-data. The spec's "no vibe-coded auth" rule is honored by **also** enabling
-Vercel Deployment Protection on the project (see README — this is a required
-setup step, and the incognito acceptance test from spec §7 still applies).
+compared with `crypto.timingSafeEqual`) originally gated only the review API;
+Vercel Authentication was to cover page views. Vercel's "All Deployments"
+protection level turned out to be plan-gated on the owner's account, so per
+owner decision the same password now gates **everything**: the page shows a
+lock screen until the password verifies server-side (`/api/auth`), the canon
+is served only through the authenticated `/api/canon` endpoint, and the
+static deploy bundle contains no quote data at all (`tools/build-viewer.mjs`
+enforces this). Vercel's free Standard Protection still covers preview URLs.
+The incognito acceptance test from spec §7 still applies: an unauthenticated
+visitor must see only the lock screen, never a quote.
+
+## A6 — Display names are "first name + last initial", not initials (owner decision, 2026-07-16)
+
+The owner chose readable labels ("Ludi V", "Scott S") over strict initials,
+since the entire dashboard now sits behind the password. Rules preserved:
+full surnames never appear anywhere off-machine; the roster (full name →
+label) stays local-only; labels are stable forever once assigned; spec §9.4
+still applies unchanged — anything generated FROM the canon for external use
+(marketing, site, book) strips identifying detail, and named attribution
+requires that man's explicit recorded yes.

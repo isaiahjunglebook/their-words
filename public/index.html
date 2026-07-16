@@ -8,7 +8,21 @@
   <link rel="stylesheet" href="/style.css" />
 </head>
 <body>
-  <header class="site-header">
+  <!-- Lock screen: nothing renders and no quote data is fetched until the
+       password is verified server-side. -->
+  <div id="gate" class="gate">
+    <div class="gate-box">
+      <h1>Their Words</h1>
+      <p class="muted">Private corpus. Enter the password to continue.</p>
+      <form id="gate-form" class="row">
+        <input type="password" id="gate-input" placeholder="Password" autocomplete="current-password" autofocus />
+        <button class="btn btn-primary" type="submit">Enter</button>
+      </form>
+      <p id="gate-error" class="error" hidden></p>
+    </div>
+  </div>
+
+  <header class="site-header" hidden>
     <div class="header-inner">
       <div>
         <h1>Their Words</h1>
@@ -17,6 +31,7 @@
       <div class="header-right">
         <div class="stats" id="stats"></div>
         <button id="review-toggle" class="btn btn-quiet" type="button">Review</button>
+        <button id="lock-btn" class="btn btn-quiet" type="button">Lock</button>
       </div>
     </div>
   </header>
@@ -24,20 +39,9 @@
   <!-- ===================== Review dashboard (password-gated) ===================== -->
   <section id="review-panel" class="review-panel" hidden>
     <div class="panel-inner">
-      <div id="review-locked">
-        <h2>Review queue</h2>
-        <p class="muted">Enter the review password to see pending candidates.</p>
-        <form id="password-form" class="row">
-          <input type="password" id="password-input" placeholder="Password" autocomplete="current-password" />
-          <button class="btn btn-primary" type="submit">Unlock</button>
-        </form>
-        <p id="password-error" class="error" hidden></p>
-      </div>
-
-      <div id="review-unlocked" hidden>
+      <div id="review-unlocked">
         <div class="row space-between">
           <h2>Review queue <span id="pending-count" class="count-pill"></span></h2>
-          <button id="lock-btn" class="btn btn-quiet" type="button">Lock</button>
         </div>
         <p class="muted">One decision per quote. The quote text is verbatim from the call —
           the only edits allowed are trimming the context window and bracketed
@@ -50,7 +54,7 @@
           <form id="add-text-form">
             <div class="row wrap">
               <label>Date <input type="date" id="tx-date" required /></label>
-              <label>Initials <input type="text" id="tx-man" maxlength="5" placeholder="SS" required /></label>
+              <label>Name label <input type="text" id="tx-man" maxlength="24" placeholder="Ludi V" required /></label>
             </div>
             <label>Quote (verbatim)
               <textarea id="tx-quote" rows="3" required></textarea>
@@ -67,7 +71,7 @@
   </section>
 
   <!-- ===================== Canon viewer ===================== -->
-  <main>
+  <main hidden>
     <div class="controls">
       <input type="search" id="search" placeholder="Search the men’s words… (e.g. “drowning”)" />
       <div class="chips" id="tag-chips"></div>
@@ -78,8 +82,8 @@
     <p id="empty" class="empty" hidden>No entries match.</p>
   </main>
 
-  <footer class="site-footer">
-    <p>Private corpus for The Expedition. Initials only; named attribution only with recorded permission.</p>
+  <footer class="site-footer" hidden>
+    <p>Private corpus for The Expedition. First names only inside this dashboard; anything used outside it is anonymized, and named attribution happens only with recorded permission.</p>
   </footer>
 
   <script src="/app.js"></script>

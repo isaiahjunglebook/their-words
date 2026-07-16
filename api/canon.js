@@ -1,9 +1,12 @@
+import { checkAuth } from '../lib/auth.mjs';
 import { readFile } from '../lib/github.mjs';
 
-// Live canon straight from the repo head, so freshly approved entries show up
-// in the viewer without waiting for a redeploy. The viewer falls back to the
-// static /their-words.json bundled at deploy time if this endpoint fails.
+// Live canon straight from the repo head. Password-gated: the entire site is
+// behind ADMIN_PASSWORD (owner decision — Vercel's all-deployments protection
+// is plan-gated), so no quote data is served without it. The static bundle
+// contains no canon copy (see tools/build-viewer.mjs).
 export default async function handler(req, res) {
+  if (!checkAuth(req, res)) return;
   try {
     const text = await readFile('their-words.json');
     if (!text) return res.status(404).json({ error: 'canon not found' });

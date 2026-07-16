@@ -98,11 +98,11 @@ main { max-width: 960px; margin: 0 auto; padding: 1.25rem 1rem 3rem; }
 .muted { color: var(--muted); font-size: 0.85rem; }
 .error { color: var(--danger); font-size: 0.85rem; }
 
-#password-input, .add-text input, .add-text textarea, .cand-quote, .cand-tags {
+#gate-input, .add-text input, .add-text textarea, .cand-quote, .cand-tags {
   border: 1px solid var(--line); border-radius: 8px; padding: 0.5rem 0.7rem;
   font-size: 0.95rem; background: #fff; width: 100%;
 }
-#password-form input { max-width: 260px; }
+
 
 .batch { margin: 1.25rem 0 0.5rem; }
 .batch-title { font-weight: 700; font-size: 0.95rem; }
@@ -137,3 +137,17 @@ label input, label textarea { margin-top: 0.25rem; }
   font-size: 0.85rem; opacity: 0; transition: opacity 0.2s; pointer-events: none; z-index: 50;
 }
 .toast.show { opacity: 1; }
+
+/* Site-wide lock screen */
+.gate {
+  min-height: 100vh; display: flex; align-items: center; justify-content: center;
+  background: var(--bg); padding: 1rem;
+}
+.gate-box {
+  background: var(--card); border: 1px solid var(--line); border-radius: 14px;
+  padding: 2rem 2.2rem; max-width: 380px; width: 100%; text-align: center;
+}
+.gate-box h1 { margin-bottom: 0.25rem; }
+.gate-box form { justify-content: center; margin-top: 1rem; }
+.gate-box input { max-width: 200px; }
+.gate-box .error { margin-top: 0.6rem; }

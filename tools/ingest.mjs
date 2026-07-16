@@ -5,7 +5,7 @@
 // call-level tags intersect the configured ingest set:
 //   1. read the transcript in place (never copied into this repo),
 //   2. extract candidate quotes + proposed tags via one Claude API call,
-//   3. ANONYMIZE (roster initials, third-party names bracket-redacted)
+//   3. ANONYMIZE (roster labels — "Ludi V" style, third-party names bracket-redacted)
 //      before anything is written,
 //   4. write candidates/<slug>.json, mark the slug ingested, commit + push
 //      so the dashboard review queue picks it up.
@@ -25,7 +25,7 @@ const repoRoot = path.resolve(path.dirname(new URL(import.meta.url).pathname), '
 const expand = (p) => p.replace(/^~(?=$|\/)/, os.homedir());
 
 // Auto mode (watcher/launchd): no terminal attached, so never prompt —
-// auto-accept suggested initials for new participants and log the decision.
+// auto-accept suggested name labels for new participants and log the decision.
 const AUTO = process.argv.includes('--auto') || !process.stdin.isTTY;
 
 // Load .env (gitignored) so the watcher gets ANTHROPIC_API_KEY without a shell profile.
@@ -67,44 +67,43 @@ function loadRoster() {
 function saveRoster(roster) {
   fs.writeFileSync(
     path.join(repoRoot, 'roster.yaml'),
-    '# Full name -> canonical initials. LOCAL ONLY — gitignored, never pushed.\n' +
+    '# Full name -> display label ("Ludi V" style). LOCAL ONLY — gitignored, never pushed.\n' +
       yaml.dump(roster)
   );
 }
 
-function suggestInitials(name, taken) {
-  const base = name
-    .split(/\s+/)
-    .map((w) => w[0])
-    .join('')
-    .toUpperCase()
-    .slice(0, 3);
+// Display label: first name + last-name initial ("Ludwig Vance" -> "Ludwig V",
+// "Ludi" -> "Ludi"). Owner decision 2026-07-16 (DECISIONS.md A6) — the
+// dashboard is private, so first names are allowed; full surnames never are.
+function suggestLabel(name, taken) {
+  const parts = name.trim().split(/\s+/);
+  const base = parts.length > 1 ? `${parts[0]} ${parts[parts.length - 1][0].toUpperCase()}` : parts[0];
   if (!taken.has(base)) return base;
-  for (let i = 2; i < 10; i++) if (!taken.has(base + i)) return base + i;
-  return base + Math.floor(Math.random() * 100);
+  for (let i = 2; i < 10; i++) if (!taken.has(`${base}${i}`)) return `${base}${i}`;
+  return `${base}${Math.floor(Math.random() * 100)}`;
 }
 
-// Ensure every participant (except unknown strays) has stable initials.
+// Ensure every participant has a stable display label.
 async function resolveRoster(participants, roster, rl) {
   const taken = new Set(Object.values(roster));
   for (const name of participants) {
     if (roster[name]) continue;
-    const suggestion = suggestInitials(name, taken);
+    const suggestion = suggestLabel(name, taken);
     if (AUTO) {
-      console.log(`  auto-assigned initials for new participant: ${suggestion}`);
+      console.log(`  auto-assigned label for new participant: ${suggestion}`);
       roster[name] = suggestion;
       taken.add(suggestion);
       continue;
     }
     const answer = (
-      await rl.question(`New participant "${name}" — initials [${suggestion}]: `)
-    ).trim().toUpperCase();
-    const initials = answer || suggestion;
-    if (taken.has(initials)) {
-      console.log(`  "${initials}" is taken; using ${suggestion} instead.`);
+      await rl.question(`New participant "${name}" — label [${suggestion}]: `)
+    ).trim();
+    const label = answer || suggestion;
+    if (taken.has(label)) {
+      console.log(`  "${label}" is taken; using ${suggestion} instead.`);
       roster[name] = suggestion;
     } else {
-      roster[name] = initials;
+      roster[name] = label;
     }
     taken.add(roster[name]);
   }
@@ -182,16 +181,19 @@ ${tagRegistry}`;
   return JSON.parse(text).quotes || [];
 }
 
-// Replace every rostered full name (and bare first name, word-bounded) with initials.
+// Replace every rostered full name with its display label. Bare first names
+// are substituted only when the label doesn't already start with that first
+// name (with "Ludi V"-style labels a bare "Ludi" in a quote is already fine;
+// with initials-style labels it still gets replaced).
 function anonymize(text, roster) {
   let out = text;
   const names = Object.keys(roster).sort((a, b) => b.length - a.length);
   for (const name of names) {
-    const initials = roster[name];
-    out = out.replace(new RegExp(name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'g'), initials);
+    const label = roster[name];
+    out = out.replace(new RegExp(name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'g'), label);
     const first = name.split(/\s+/)[0];
-    if (first.length > 2) {
-      out = out.replace(new RegExp(`\\b${first}\\b`, 'g'), initials);
+    if (first.length > 2 && !label.startsWith(first)) {
+      out = out.replace(new RegExp(`\\b${first}\\b`, 'g'), label);
     }
   }
   return out;
@@ -261,7 +263,7 @@ async function main() {
     const raw = await extractQuotes(client, config.model, transcript, tagRegistry, ownerName);
 
     // Hard owner-exclusion backstop, then anonymize BEFORE writing anything.
-    const ownerInitialsSet = new Set(
+    const ownerLabelSet = new Set(
       Object.entries(roster)
         .filter(([name]) => name.toLowerCase().includes(ownerName.toLowerCase()))
         .map(([, ini]) => ini)
@@ -270,7 +272,7 @@ async function main() {
       .filter((q) => !q.speaker.toLowerCase().includes(ownerName.toLowerCase()))
       .map((q, i) => ({
         id: `c${i + 1}`,
-        man: roster[q.speaker] || suggestInitials(q.speaker, new Set(Object.values(roster))),
+        man: roster[q.speaker] || suggestLabel(q.speaker, new Set(Object.values(roster))),
         timestamp: q.timestamp,
         quote: anonymize(q.quote, roster),
         tags: q.tags,
@@ -278,7 +280,7 @@ async function main() {
         proposed_new_tag: q.proposed_new_tag || null,
         why: anonymize(q.why || '', roster),
       }))
-      .filter((q) => !ownerInitialsSet.has(q.man));
+      .filter((q) => !ownerLabelSet.has(q.man));
 
     const batch = {
       slug,

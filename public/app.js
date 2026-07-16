@@ -53,20 +53,15 @@
     return data;
   }
 
-  // ---------- canon loading ----------
+  // ---------- canon loading (password-gated, live from GitHub) ----------
   async function loadCanon() {
-    // Prefer the live canon from GitHub (no redeploy lag); fall back to the
-    // static copy bundled at deploy time.
-    for (const url of ['/api/canon', '/their-words.json']) {
-      try {
-        const res = await fetch(url);
-        if (!res.ok) continue;
-        const data = await res.json();
-        entries = data.entries || [];
-        return;
-      } catch { /* try next */ }
+    try {
+      const data = await api('/api/canon');
+      entries = data.entries || [];
+    } catch (err) {
+      entries = [];
+      if (err.status !== 404) toast(`Could not load canon: ${err.message}`);
     }
-    entries = [];
   }
 
   // ---------- viewer rendering ----------
@@ -147,11 +142,6 @@
   function render() { renderStats(); renderChips(); renderCards(); }
 
   // ---------- review dashboard ----------
-  function setUnlocked(unlocked) {
-    $('#review-locked').hidden = unlocked;
-    $('#review-unlocked').hidden = !unlocked;
-  }
-
   async function loadQueue() {
     const queue = $('#queue');
     queue.replaceChildren(el('p', { class: 'muted' }, 'Loading queue…'));
@@ -173,7 +163,7 @@
         for (const q of batch.quotes) queue.append(candidateCard(batch, q));
       }
     } catch (err) {
-      if (err.status === 401) { lock('Wrong password.'); return; }
+      if (err.status === 401) { lockSite('Session expired — enter the password again.'); return; }
       queue.replaceChildren(el('p', { class: 'error' }, `Could not load queue: ${err.message}`));
     }
   }
@@ -228,25 +218,33 @@
     return card;
   }
 
-  function lock(message) {
+  // ---------- site-wide gate ----------
+  function showSite(show) {
+    $('#gate').hidden = show;
+    for (const sel of ['.site-header', 'main', '.site-footer']) $(sel).hidden = !show;
+    if (!show) $('#review-panel').hidden = true;
+  }
+
+  function lockSite(message) {
     password = '';
     sessionStorage.removeItem('tw-password');
-    setUnlocked(false);
-    const errBox = $('#password-error');
+    showSite(false);
+    const errBox = $('#gate-error');
     errBox.hidden = !message;
     if (message) errBox.textContent = message;
   }
 
-  async function unlock(pw) {
+  async function unlockSite(pw) {
     password = pw;
     try {
-      await api('/api/candidates'); // validates the password
+      await api('/api/auth'); // server-side password check only
       sessionStorage.setItem('tw-password', pw);
-      $('#password-error').hidden = true;
-      setUnlocked(true);
-      await loadQueue();
+      $('#gate-error').hidden = true;
+      showSite(true);
+      await loadCanon();
+      render();
     } catch (err) {
-      lock(err.status === 401 ? 'Wrong password.' : `Server error: ${err.message}`);
+      lockSite(err.status === 401 ? 'Wrong password.' : `Server error: ${err.message}`);
     }
   }
 
@@ -258,14 +256,16 @@
   $('#review-toggle').addEventListener('click', async () => {
     const panel = $('#review-panel');
     panel.hidden = !panel.hidden;
-    if (!panel.hidden && password) await unlock(password);
-    if (!panel.hidden) panel.scrollIntoView({ behavior: 'smooth' });
+    if (!panel.hidden) {
+      await loadQueue();
+      panel.scrollIntoView({ behavior: 'smooth' });
+    }
   });
-  $('#password-form').addEventListener('submit', (e) => {
+  $('#gate-form').addEventListener('submit', (e) => {
     e.preventDefault();
-    unlock($('#password-input').value);
+    unlockSite($('#gate-input').value);
   });
-  $('#lock-btn').addEventListener('click', () => lock());
+  $('#lock-btn').addEventListener('click', () => lockSite());
   $('#add-text-form').addEventListener('submit', async (e) => {
     e.preventDefault();
     const status = $('#tx-status');
@@ -289,5 +289,9 @@
     }
   });
 
-  loadCanon().then(render);
+  if (password) {
+    unlockSite(password);
+  } else {
+    showSite(false);
+  }
 })();

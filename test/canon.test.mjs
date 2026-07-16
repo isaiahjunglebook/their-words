@@ -36,7 +36,9 @@ test('validation rejects bad entries', () => {
   assert.equal(validateEntry(sample()).length, 0);
   assert.ok(validateEntry(sample({ tags: [] })).length > 0);
   assert.ok(validateEntry(sample({ quote: '  ' })).length > 0);
-  assert.ok(validateEntry(sample({ man: 'Scott Sample' })).length > 0); // full names never allowed
+  assert.equal(validateEntry(sample({ man: 'Ludi V' })).length, 0); // first name + last initial is fine
+  assert.ok(validateEntry(sample({ man: '' })).length > 0);
+  assert.ok(validateEntry(sample({ man: 'A'.repeat(30) })).length > 0);
   assert.ok(validateEntry(sample({ date: '8/1/26' })).length > 0);
 });
 
