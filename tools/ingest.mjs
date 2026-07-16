@@ -244,8 +244,10 @@ async function main() {
       callTags.some((t) => ingestTags.has(t)) ||
       [...ingestTags].some((t) => nameText.includes(t));
     if (!matches) {
-      console.log(`- ${slug}: tags [${callTags.join(', ')}] don't match ingest set, skipping`);
-      state.slugs.push(slug); // decided: not ours; don't re-evaluate every run
+      // Skip but do NOT mark ingested — if the owner later adds a keyword to
+      // ingest_tags (or renames conventions), earlier calls get re-evaluated
+      // on the next run instead of being locked out forever.
+      console.log(`- ${slug}: tags [${callTags.join(', ')}] / name don't match ingest set (${[...ingestTags].join(', ')}), skipping`);
       continue;
     }
 
