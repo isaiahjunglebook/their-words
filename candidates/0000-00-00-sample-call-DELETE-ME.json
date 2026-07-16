@@ -1,0 +1,28 @@
+{
+  "slug": "0000-00-00-sample-call-DELETE-ME",
+  "call_name": "SAMPLE DATA — Turbo Squad: Call 0 (kill these to test the dashboard)",
+  "date": "2026-07-16",
+  "context_label": "Squad call 0",
+  "quotes": [
+    {
+      "id": "c1",
+      "man": "ZZ",
+      "timestamp": "00:14:22",
+      "quote": "SAMPLE — I keep telling myself I'll be more present when work slows down. It never slows down. It's been never-slowing-down for six years.",
+      "tags": ["deferral"],
+      "tag_note": "future tense = deferral",
+      "proposed_new_tag": null,
+      "why": "Fake sample quote for testing the review flow. Kill it (or approve it, then note the TW id it consumed)."
+    },
+    {
+      "id": "c2",
+      "man": "ZX",
+      "timestamp": "00:31:05",
+      "quote": "SAMPLE — When you said the part about performing fatherhood instead of living it, that's me. My wife [K—] says the same thing.",
+      "tags": ["founder-story-resonance"],
+      "tag_note": "",
+      "proposed_new_tag": null,
+      "why": "Fake sample quote showing a bracketed third-party redaction."
+    }
+  ]
+}

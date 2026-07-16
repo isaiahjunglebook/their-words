@@ -1,0 +1,16 @@
+{
+  "name": "their-words",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Verbatim quote database + private viewer/review dashboard for The Expedition",
+  "scripts": {
+    "ingest": "node tools/ingest.mjs",
+    "build": "node tools/build-viewer.mjs",
+    "test": "node --test test/*.test.mjs"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.71.2",
+    "js-yaml": "^4.1.0"
+  }
+}

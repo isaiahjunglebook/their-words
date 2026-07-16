@@ -1,0 +1,14 @@
+# Privacy-critical: these never leave the machine (spec §9)
+roster.yaml
+state/
+transcripts/
+.env
+.env.*
+
+# Node
+node_modules/
+
+# OS/editor noise
+.DS_Store
+*.log
+public/their-words.json

@@ -1,0 +1,6 @@
+# Their Words — pipeline configuration (no secrets in this file)
+upstream_output_dir: ~/Documents/audioprocessor/output
+ingest_tags: [squad, expedition]       # call-level tags that trigger ingestion
+owner_name: Isaiah                     # owner's turns are excluded from extraction
+review_taxonomy_every: 25              # entries between taxonomy audit prompts
+model: claude-sonnet-5                 # extraction model
