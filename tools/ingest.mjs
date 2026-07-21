@@ -261,6 +261,27 @@ async function main() {
     await resolveRoster(manifest.participants || [], roster, rl);
     saveRoster(roster);
 
+    // Slug guard (red-team-2 C-7): the slug becomes the committed candidate
+    // filename and every entry's source.slug — anonymize() can't touch it (it is
+    // the join key back to the upstream folder). If a rostered full name or
+    // surname appears in the slug, abort THIS call (write nothing, commit
+    // nothing, do NOT mark ingested) so no real name lands in a committed
+    // filename. Owner renames the upstream output folder, then re-runs.
+    const slugLower = slug.toLowerCase();
+    const nameNeedles = Object.keys(roster).flatMap((name) => {
+      const tokens = name.split(/\s+/).filter(Boolean);
+      const surname = tokens.length > 1 ? tokens[tokens.length - 1] : null;
+      return [name, surname].filter((n) => n && n.length > 2);
+    });
+    const slugHit = nameNeedles.find((n) => slugLower.includes(n.toLowerCase()));
+    if (slugHit) {
+      console.error(
+        `! ${slug}: slug contains a real name ("${slugHit}") — refusing to ingest. ` +
+          `Rename the upstream output folder to remove it, then re-run.`
+      );
+      continue;
+    }
+
     const transcript = fs.readFileSync(transcriptPath, 'utf8');
     const raw = await extractQuotes(client, config.model, transcript, tagRegistry, ownerName);
 
@@ -278,8 +299,16 @@ async function main() {
         timestamp: q.timestamp,
         quote: anonymize(q.quote, roster),
         tags: q.tags,
-        tag_note: q.tag_note || '',
-        proposed_new_tag: q.proposed_new_tag || null,
+        // red-team-2 B-4: these are free-text model output about a specific man
+        // and get auto-committed+pushed BEFORE the human review gate — anonymize
+        // them like quote/why, or a real name lands in remote history forever.
+        tag_note: anonymize(q.tag_note || '', roster),
+        proposed_new_tag: q.proposed_new_tag
+          ? {
+              name: anonymize(q.proposed_new_tag.name || '', roster),
+              definition: anonymize(q.proposed_new_tag.definition || '', roster),
+            }
+          : null,
         why: anonymize(q.why || '', roster),
       }))
       .filter((q) => !ownerLabelSet.has(q.man));
@@ -288,7 +317,7 @@ async function main() {
       slug,
       call_name: anonymize(manifest.call_name || slug, roster),
       date: manifest.date,
-      context_label: contextFromManifest(manifest),
+      context_label: anonymize(contextFromManifest(manifest), roster), // red-team-2 B-4: fallback returns raw call_name
       quotes,
     };
 
