@@ -1,0 +1,95 @@
+{
+  "slug": "2026-07-16-ludwig-call-summary-expedition",
+  "call_name": "Ludwig Call Summary: Expedition",
+  "date": "2026-07-16",
+  "context_label": "Ludwig Call Summary: Expedition",
+  "quotes": [
+    {
+      "id": "c1",
+      "man": "Ludwig",
+      "timestamp": "00:12:38",
+      "quote": "it's like my like one of the if not the number one goal i mean it's the number one goal like there's there's secondary goals but this is the number one goal like i wanna like you know um keep the bloodline going like give give to the next um generation and like that's definitely like the number one goal",
+      "tags": [
+        "dream-outcome"
+      ],
+      "tag_note": "",
+      "proposed_new_tag": null,
+      "why": "States in his own words that fatherhood/continuing the bloodline is his number one life goal — a pure articulation of his desired future."
+    },
+    {
+      "id": "c2",
+      "man": "Ludwig",
+      "timestamp": "00:12:38",
+      "quote": "i feel like it's it's more like people say like marriage is the most important decision but i feel like the person that you have kids with like is that's the most important decision um which usually goes hand in hand but i feel like that event of creating uh life for somebody is the most important decision you'll ever do in your life",
+      "tags": [
+        "dream-outcome"
+      ],
+      "tag_note": "",
+      "proposed_new_tag": null,
+      "why": "A values statement about what matters most in choosing to become a father, useful as a description of the future/decision he's oriented toward."
+    },
+    {
+      "id": "c3",
+      "man": "Ludwig",
+      "timestamp": "00:14:52",
+      "quote": "wanted to say as well like as part of why i feel like this group is so important and which with the with this view on looking at like the declining birth rates and i think a lot of it is coming down to like loneliness or people are not really building those deep bonds and tribes which ultimately will facilitate or um i think they will definitely inspire you to to form a family if you have like shared values so yeah yeah",
+      "tags": [
+        "dream-outcome"
+      ],
+      "tag_note": "",
+      "proposed_new_tag": null,
+      "why": "He connects tribe/community-building directly to the vision of forming a family, articulating the outcome he wants the group to create."
+    },
+    {
+      "id": "c4",
+      "man": "Ludwig",
+      "timestamp": "00:10:11",
+      "quote": "um i i want to share things that i know took a while to learn or that i learned from partners that i had in my life and that have just been like i don't know i don't know i don't know i don't know i don't know i don't know i don't know like in a jar with me and like i want to i want to give them i want to give them to my lads you know because i feel like there are some thoughts some ideas that have been so impactful to the way that i have a relationship with me it's it's um like yeah life-changing and it's nothing that i share or write a book about",
+      "tags": [
+        "dream-outcome"
+      ],
+      "tag_note": "",
+      "proposed_new_tag": null,
+      "why": "He names the specific future he wants — passing hard-won, life-changing knowledge to the other men — a clear articulation of what winning the container looks like for him."
+    },
+    {
+      "id": "c5",
+      "man": "Ludwig",
+      "timestamp": "00:28:50",
+      "quote": "No, I just believe that through sharing those things and, like, being vulnerable, like, you will create a connection with people and I don't want to drop it after eight weeks, you know? I want to build something that is, like, long-lasting because... I will never be so excited as I am for the first time to share those experiences and share, like, my story and, like, the hardships and all of that, you know?",
+      "tags": [
+        "dream-outcome"
+      ],
+      "tag_note": "",
+      "proposed_new_tag": null,
+      "why": "Explicit statement of the outcome he wants from the container — lasting connection, not a temporary eight-week experience."
+    },
+    {
+      "id": "c6",
+      "man": "Ludwig",
+      "timestamp": "00:38:19",
+      "quote": "Yeah, I feel like... Okay, so one of the things... It's like... And that's actually something that I took away as a child. Like, I think, like, a childhood trauma. It's like my mom would always... When I asked her for something, she would always give her... Bring something that she thought would be better. But without acknowledging, like, what I wanted. And that became, like, a trauma for me. And going, like, becoming... And actually, it's funny because, like, this was the first time that I talked with her about it. Because this was something that I just, like, found out now through, like, really, like, introspective and, like, understanding why do I get so upset when somebody brings me something that is different from what I asked them for, you know? And it's really coming from there.",
+      "tags": [
+        "mother"
+      ],
+      "tag_note": "",
+      "proposed_new_tag": {
+        "name": "mother",
+        "definition": "Any description of the man's own mother — what she did, didn't do, said, modeled, or withheld — including patterns he traces back to her influence."
+      },
+      "why": "A raw, first-time-articulated childhood pattern traced directly to his mother's behavior, surfaced live through the conversation."
+    },
+    {
+      "id": "c7",
+      "man": "Ludwig",
+      "timestamp": "00:40:35",
+      "quote": "So there's this pattern from my mom. She would... Always try to defend me in front of my dad. And it's still to this day. So when I would have, like, a discussion with my dad, she would always try to jump in and defend me. And that would annoy me because then I would see them fighting and I wouldn't be able to really bond with my dad or, like, build a connection over, like, that... I mean, we do have a strong connection, but I think it could be way stronger if that wasn't the case. Through, like, fighting... Through fights and resolving those fights.",
+      "tags": [
+        "father"
+      ],
+      "tag_note": "",
+      "proposed_new_tag": null,
+      "why": "Describes a dynamic that shaped and limited his bond with his own father — directly on-tag for the father category, including recognition of what could have been stronger."
+    }
+  ]
+}
